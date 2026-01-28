@@ -34,7 +34,7 @@ const ScreenWrapper = ({
         >
 
             <View style={[{ flex: 1, paddingTop, paddingBottom }, style]}>
-                <StatusBar barStyle="light-content" backgroundColor={'transparent'} />
+                <StatusBar barStyle="dark-content" backgroundColor={'transparent'} />
                 {/* The screenshot cuts off at the return statement, 
             but usually follows with an ImageBackground if showPattern is true 
         */}

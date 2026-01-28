@@ -1,30 +1,14 @@
+import ScreenWrapper from '@/components/common/ScreenWrapper';
 import { colors } from '@/constants/my-theme';
-import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
-import { Animated, StatusBar, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import Register from './(auth)/Register';
 
 const FirstPage = () => {
-    const router = useRouter()
-    // use effect to go to welcome page
-    useEffect(() => {
-        setTimeout(() => {
-            router.replace('/(auth)/welcome');
-        }, 1000);
-    }, []);
-
 
     return (
-        <View style={styles.container}>
-            <StatusBar
-                barStyle={'light-content'}
-                backgroundColor={colors.neutral400}
-            />
-            <Animated.Image
-                source={require('@/assets/images/welcome.jpg')}
-                style={styles.logo}
-                resizeMode={'contain'}
-            />
-        </View>
+        <ScreenWrapper showPattern bgOpacity={0.5}>
+            <Register />
+        </ScreenWrapper>
     )
 }
 
