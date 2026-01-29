@@ -1,6 +1,8 @@
+import { useAuth } from '@/contexts/Auth';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -12,14 +14,16 @@ import {
 
 const Register = () => {
 
+    const { signUp } = useAuth();
+
     const router = useRouter()
 
+    const [loading, setLoading] = useState(false);
+
     const [formData, setFormData] = useState({
-        full_name: '',
-        email: '',
-        password: '',
-        phone: '',
-        role: 'STAFF' // 
+        name: 'mm',
+        email: 'mm@gmail.com',
+        password: '123',
     });
 
     const handleChange = (name: string, value: string) => {
@@ -28,11 +32,15 @@ const Register = () => {
 
     const handleRegister = async () => {
         console.log("🚀 Data prepared to send:", formData);
-
+        setLoading(true);
         try {
-            alert("Check console to see the prepared object!");
+            const res = await signUp(formData.email, formData.password, formData.name)
+            console.log("🚀 ~ handleRegister ~ res:", res)
+            // alert("Check console to see the prepared object!");
         } catch (error) {
             console.error("Registration failed:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -49,9 +57,9 @@ const Register = () => {
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Full Name"
-                    value={formData.full_name}
-                    onChangeText={(val) => handleChange('full_name', val)}
+                    placeholder="Name"
+                    value={formData.name}
+                    onChangeText={(val) => handleChange('name', val)}
                 />
 
                 <TextInput
@@ -65,29 +73,29 @@ const Register = () => {
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Phone Number"
-                    keyboardType="phone-pad"
-                    value={formData.phone}
-                    onChangeText={(val) => handleChange('phone', val)}
-                />
-
-                <TextInput
-                    style={styles.input}
                     placeholder="Password"
                     secureTextEntry
                     value={formData.password}
                     onChangeText={(val) => handleChange('password', val)}
                 />
 
-                <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                    <Text style={styles.buttonText}>Register</Text>
+                <TouchableOpacity disabled={loading} style={styles.button} onPress={handleRegister}>
+                    <Text style={styles.buttonText}>
+                        {
+                            loading ?
+                                <ActivityIndicator color={'white'} /> :
+                                <>
+                                    Register
+                                </>
+                        }
+                    </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={
                     () => {
                         router.push('/(auth)/Login')
                     }
                 }>
-                    <Text style={styles.buttonText}>Login ?</Text>
+                    <Text style={styles.buttonText}>Have an accout ? Login</Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>

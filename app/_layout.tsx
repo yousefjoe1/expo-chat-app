@@ -1,8 +1,19 @@
 import 'react-native-reanimated';
 
-import { Stack } from 'expo-router';
-import React from 'react';
+import { AuthProvider } from '@/contexts/Auth';
+import { Stack } from "expo-router";
+import React from "react";
 
-export default function RootLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />
-}
+const StackLayout = () => {
+  return <Stack screenOptions={{ headerShown: false }} />;
+};
+
+const RootLayout = () => {
+  return (
+    <AuthProvider>
+      <StackLayout />
+    </AuthProvider>
+  );
+};
+
+export default RootLayout;
