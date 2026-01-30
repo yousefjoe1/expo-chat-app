@@ -1,6 +1,8 @@
 import BackBtn from '@/components/common/BackBtn';
+import { useAuth } from '@/contexts/Auth';
 import React, { useState } from 'react';
 import {
+    ActivityIndicator,
     ImageBackground,
     KeyboardAvoidingView,
     Platform,
@@ -10,9 +12,11 @@ import {
     TextInput,
     TouchableOpacity
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Login = () => {
-    // 1. تجهيز البيانات (State)
+    const { signIn } = useAuth();
+
     const [formData, setFormData] = useState({
         full_name: '',
         email: '',
@@ -21,66 +25,77 @@ const Login = () => {
         role: 'STAFF' //
     });
 
+    const [loading, setLoading] = useState(false);
+
     const handleChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
     };
 
     const handleRegister = async () => {
         console.log("🚀 Data prepared to send:", formData);
-
+        setLoading(true);
         try {
-            // const response = await fetch('YOUR_BACKEND_URL/auth/register', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(formData)
-            // });
-            // const result = await response.json();
+            const res = await signIn(formData.email, formData.password)
+
             alert("Check console to see the prepared object!");
         } catch (error) {
             console.error("Registration failed:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <ImageBackground
-            source={require("@/assets/images/login-bg.jpg")}
-            style={{ flex: 1 }}
-        >
-            <BackBtn />
-
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        <SafeAreaView style={{ flex: 1 }} >
+            <ImageBackground
+                source={require("@/assets/images/login-bg.jpg")}
                 style={{ flex: 1 }}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
             >
-                <ScrollView
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={styles.scrollContainer}>
-                    <Text style={styles.title}>Login into your account</Text>
+                <BackBtn />
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        value={formData.email}
-                        onChangeText={(val) => handleChange('email', val)}
-                    />
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+                >
+                    <ScrollView
+                        keyboardShouldPersistTaps="handled"
+                        contentContainerStyle={styles.scrollContainer}>
+                        <Text style={styles.title}>Login into your account</Text>
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Password"
-                        secureTextEntry
-                        value={formData.password}
-                        onChangeText={(val) => handleChange('password', val)}
-                    />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Email"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            value={formData.email}
+                            onChangeText={(val) => handleChange('email', val)}
+                        />
 
-                    <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                        <Text style={styles.buttonText}>Register</Text>
-                    </TouchableOpacity>
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </ImageBackground>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Password"
+                            secureTextEntry
+                            value={formData.password}
+                            onChangeText={(val) => handleChange('password', val)}
+                        />
+
+                        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                            <Text style={styles.buttonText}>
+                                {
+                                    loading ?
+                                        <ActivityIndicator color={'white'} /> :
+                                        <>
+                                            Login
+                                        </>
+                                }
+                            </Text>
+                        </TouchableOpacity>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </ImageBackground>
+
+        </SafeAreaView>
     );
 };
 
