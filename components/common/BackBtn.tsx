@@ -1,23 +1,25 @@
 import { useRouter } from 'expo-router'
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { ImageBackground, StyleSheet, TouchableOpacity } from 'react-native'
 
 const BackBtn = () => {
     const router = useRouter()
     return (
         <TouchableOpacity onPress={() => router.back()}
             style={{
-                backgroundColor: 'white', marginTop: 20, 'width': 50, height: 50, borderRadius: 50,
-                justifyContent: 'center', alignItems: 'center'
+                backgroundColor: 'white', 'width': 55, height: 55, borderRadius: 50,
+                justifyContent: 'center', alignItems: 'center', overflow: 'hidden'
             }}
         >
-            <Text
+            <ImageBackground
+                source={require("@/assets/images/back-btn.jpg")}
                 style={{
-                    fontSize: 20,
-                    fontWeight: 'bold',
-                    color: 'black',
+                    flex: 1, width: 55, height: 55, borderRadius: 50, justifyContent: 'center', alignItems: 'center'
+                    , transform: [{ rotate: '90deg' }]
                 }}
-            >{'<'}</Text>
+                resizeMode='stretch'
+            >
+            </ImageBackground>
         </TouchableOpacity>
     )
 }
