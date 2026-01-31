@@ -8,9 +8,11 @@ import { ActivityIndicator, Alert, ImageBackground, ScrollView, StyleSheet, Text
 
 import Logout from '@/components/common/userProfile/Logout'
 import { updateProfileSocket } from '@/socket/socketEvents'
+import { uploadFileToCloudinary } from '@/utils/imageServices'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
+import { SafeAreaView } from 'react-native-safe-area-context'
 const Profile = () => {
     const { user, updateToken } = useAuth()
     const [formData, setFormData] = React.useState({
@@ -19,14 +21,8 @@ const Profile = () => {
     });
     const [loading, setLoading] = React.useState(false);
     const router = useRouter();
-    const [image, setImage] = React.useState<string | null>(null);
 
     const pickImage = async () => {
-        // No permissions request is necessary for launching the image library.
-        // Manually request permissions for videos on iOS when `allowsEditing` is set to `false`
-        // and `videoExportPreset` is `'Passthrough'` (the default), ideally before launching the picker
-        // so the app users aren't surprised by a system dialog after picking a video.
-        // See "Invoke permissions for videos" sub section for more details.
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (!permissionResult.granted) {
@@ -69,8 +65,23 @@ const Profile = () => {
         }
     };
     const handleUpdate = async () => {
+        const { name, avatar } = formData
         setLoading(true);
+        let data = {
+            name, avatar
+        }
         try {
+            if (avatar) {
+                setLoading(true);
+                const res = await uploadFileToCloudinary(avatar, "profiles");
+                if (res.success) {
+                    data.avatar = res.data;
+                } else {
+                    Alert.alert("User", res.msg);
+                    setLoading(false);
+                    return;
+                }
+            }
             updateProfileSocket(formData);
             alert("Profile Updated Successfully!");
         } catch (error) {
@@ -84,7 +95,7 @@ const Profile = () => {
             source={require("@/assets/images/full-ninja.jpg")}
             style={{ flex: 1 }}
         >
-            <View style={{ flex: 1, backgroundColor: colors.myBubble + '60' }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: colors.myBubble + '60' }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 20, marginHorizontal: 10 }}>
                     <BackBtn />
                     <Logout />
@@ -156,7 +167,7 @@ const Profile = () => {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-            </View>
+            </SafeAreaView>
         </ImageBackground>
     )
 }

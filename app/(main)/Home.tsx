@@ -1,3 +1,4 @@
+import Chats from '@/components/chats/Chats';
 import { colors } from '@/constants/my-theme';
 import { useAuth } from '@/contexts/Auth';
 import { testSocket } from '@/socket/socketEvents';
@@ -37,15 +38,21 @@ const Home = () => {
                         Welcome 👋 {user?.name}
                     </Text>
 
-                    <TouchableOpacity onPress={() => route.push('/Profile')}>
+                    <TouchableOpacity onPress={() => route.push('/Profile')}
+                        style={{ overflow: 'hidden', width: 50, height: 50, borderRadius: 50 }}
+                    >
                         <ImageBackground
                             source={require("@/assets/images/Shuriken-profile-btn.jpg")}
-                            style={{ flex: 1, width: 50, height: 50, borderRadius: 50 }}
+                            style={{ width: 50, height: 50 }}
+                            resizeMode='contain'
                         >
                         </ImageBackground>
                     </TouchableOpacity>
 
                 </View>
+
+                {/* chats */}
+                <Chats />
             </SafeAreaView>
         </ImageBackground>
 
