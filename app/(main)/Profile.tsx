@@ -9,15 +9,48 @@ import { ActivityIndicator, Alert, ImageBackground, ScrollView, StyleSheet, Text
 import Logout from '@/components/common/userProfile/Logout'
 import { updateProfileSocket } from '@/socket/socketEvents'
 import AntDesign from '@expo/vector-icons/AntDesign'
+import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
-
 const Profile = () => {
     const { user, updateToken } = useAuth()
     const [formData, setFormData] = React.useState({
         name: user?.name || '',
+        avatar: user?.avatar || '',
     });
     const [loading, setLoading] = React.useState(false);
     const router = useRouter();
+    const [image, setImage] = React.useState<string | null>(null);
+
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library.
+        // Manually request permissions for videos on iOS when `allowsEditing` is set to `false`
+        // and `videoExportPreset` is `'Passthrough'` (the default), ideally before launching the picker
+        // so the app users aren't surprised by a system dialog after picking a video.
+        // See "Invoke permissions for videos" sub section for more details.
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (!permissionResult.granted) {
+            Alert.alert('Permission required', 'Permission to access the media library is required.');
+            return;
+        }
+
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            aspect: [4, 3],
+            quality: 0.5,
+        });
+
+        console.log(result);
+
+        if (!result.canceled) {
+            setFormData({
+                ...formData,
+                avatar: result.assets[0].uri,
+            });
+        }
+    };
+
+
     useEffect(() => {
         updateProfileSocket(processUpdateProfile);
         return () => {
@@ -26,7 +59,6 @@ const Profile = () => {
     }, []);
 
     const processUpdateProfile = (res: any) => {
-        console.log("got res: ", res);
         setLoading(false);
 
         if (res.success) {
@@ -59,8 +91,9 @@ const Profile = () => {
                 </View>
                 <ScrollView>
                     <View style={{ position: 'relative' }}>
-                        <Avatar uri={user?.avatar || ''} size={100} isGroup={false} />
+                        <Avatar uri={formData.avatar || ''} size={100} />
                         <TouchableOpacity
+                            onPress={pickImage}
                             style={{
                                 position: 'absolute',
                                 bottom: 0,
@@ -71,6 +104,7 @@ const Profile = () => {
                             }}
                         >
                             <AntDesign name="edit" size={24} color="black" />
+                            {/* {formData.avatar && <Image source={{ uri: formData.avatar }} style={{ width: 200, height: 200 }} />} */}
                         </TouchableOpacity>
                     </View>
                     {/* <Text
